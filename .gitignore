@@ -40,6 +40,8 @@ ENV/
 
 # Environment variables
 .env
+backend/.env
+frontend/.env
 
 # Logs
 *.log
@@ -47,21 +49,11 @@ ENV/
 # Uploads
 uploads/
 vector_db/
-datasets/processed/
 
 # Node
 node_modules/
 npm-debug.log*
 
-# Build
-build/
-dist/
-
 # OS
 .DS_Store
 Thumbs.db
-
-# Environment variables
-.env
-backend/.env
-frontend/.env
