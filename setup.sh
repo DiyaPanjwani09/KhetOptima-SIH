@@ -1,10 +1,10 @@
 #!/bin/bash
-# AI-powered Research Paper Intelligence Engine - Setup Script
+# KhetOptima - Farm Decision & Crop Portfolio Optimization Engine
 
 set -e
 
 echo "=========================================="
-echo "AI-powered Research Paper Intelligence Engine Setup"
+echo "KhetOptima Setup"
 echo "=========================================="
 
 # Check if Python is installed
@@ -35,7 +35,7 @@ pip install --upgrade pip
 pip install -r ../requirements.txt
 
 # Create necessary directories
-mkdir -p uploads vector_db datasets/processed
+mkdir -p uploads
 
 echo "Step 2: Setting up frontend..."
 cd ../frontend
@@ -43,25 +43,14 @@ cd ../frontend
 # Install dependencies
 npm install
 
-echo "Step 3: Setting up database..."
-cd ..
-
-# Check if PostgreSQL is running
-if command -v psql &> /dev/null; then
-    echo "Please ensure PostgreSQL is running and create the database:"
-    echo "  createdb research_db"
-    echo "  psql -c \"CREATE USER user WITH PASSWORD 'password';\""
-    echo "  psql -c \"GRANT ALL PRIVILEGES ON DATABASE research_db TO user;\""
-else
-    echo "PostgreSQL is not installed. Please install PostgreSQL to use the database features."
-fi
-
-echo "Step 4: Setup complete!"
+echo "Step 3: Setup complete!"
 echo "=========================================="
 echo ""
 echo "To start the backend:"
 echo "  cd backend && uvicorn main:app --reload --port 8000"
+echo "  API docs: http://localhost:8000/docs"
+echo "  KhetOptima: http://localhost:8000/api/v1/khet-optima/optimize"
 echo ""
 echo "To start the frontend:"
-echo "  cd frontend && npm start"
+echo "  cd frontend && npm start  # http://localhost:3000"
 echo ""
