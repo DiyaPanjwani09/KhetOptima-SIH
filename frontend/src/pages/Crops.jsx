@@ -1,52 +1,86 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { khetApi } from '../services/khetApi';
-import { FaLeaf, FaWater, FaRupeeSign } from 'react-icons/fa';
 
-const RISK_COLOR={Low:'bg-green-500/15 text-green-300 border-green-500/25',Medium:'bg-yellow-500/15 text-yellow-300 border-yellow-500/25',High:'bg-orange-500/15 text-orange-300 border-orange-500/25','Very High':'bg-red-500/15 text-red-300 border-red-500/25'};
-const GLUT_COLOR={Low:'text-green-400',Medium:'text-yellow-400',High:'text-orange-400','Very High':'text-red-400'};
+const SEASONS = ['All', 'Rabi', 'Kharif', 'Zaid', 'Annual'];
 
-export default function Crops(){
-  const [crops,setCrops]=useState([]);
-  const [filter,setFilter]=useState('all');
-  useEffect(()=>{khetApi.getCrops().then(d=>setCrops(d.crops)).catch(()=>{});},[]);
-  const filtered = crops.filter(c=> filter==='all' || c.season===filter || c.category===filter);
-  const seasons=['all','Rabi','Kharif','Zaid','Annual'];
-  return(
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
-      <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center"><FaLeaf className="text-green-400"/></div><div><h1 className="text-2xl font-bold text-white">Crop Encyclopedia</h1><p className="text-sm text-slate-400">16 crops • MSP, yield, cost, water, risk & sustainability</p></div></div>
-      <div className="flex flex-wrap gap-2">
-        {seasons.map(s=>(
-          <button key={s} onClick={()=>setFilter(s)} className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${filter===s?'bg-emerald-500/20 text-emerald-300 border-emerald-500/30':'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}>{s==='all'?'All Crops':s}</button>
+export default function Crops() {
+  const [crops, setCrops] = useState([]);
+  const [filter, setFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    khetApi.getCrops()
+      .then((r) => setCrops(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = filter === 'All' ? crops : crops.filter((c) => c.season === filter);
+
+  if (loading) return <div className="max-w-6xl mx-auto px-4 py-8"><div className="flex justify-center py-12"><div className="loading-spinner"></div></div></div>;
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="page-title mb-1">Crop Encyclopedia</h1>
+      <p className="page-subtitle mb-4">Browse {crops.length} crops with economics, soil suitability, and market data</p>
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        {SEASONS.map((s) => (
+          <button key={s} onClick={() => setFilter(s)} className={`btn-sm ${filter === s ? 'btn-primary' : 'btn-secondary'}`}>
+            {s}
+          </button>
         ))}
-        <button onClick={()=>setFilter('Vegetable')} className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${filter==='Vegetable'?'bg-emerald-500/20 text-emerald-300 border-emerald-500/30':'bg-white/5 text-slate-400 border-white/10'}`}>Vegetables</button>
-        <button onClick={()=>setFilter('Pulse')} className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${filter==='Pulse'?'bg-emerald-500/20 text-emerald-300 border-emerald-500/30':'bg-white/5 text-slate-400 border-white/10'}`}>Pulses</button>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(c=>(
-          <div key={c.id} className="glass-card p-5 hover:border-emerald-500/30 transition-colors">
-            <div className="flex items-start justify-between gap-2 mb-3">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filtered.map((crop) => (
+          <div key={crop.id} className="card">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <div className="font-bold text-white flex items-center gap-2">{c.name} <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 border border-white/10 text-slate-300">{c.season}</span></div>
-                <div className="text-xs text-slate-400">{c.category} • {c.duration_days} days • {c.water_level} water</div>
+                <h3 className="font-semibold text-gray-900">{crop.name}</h3>
+                <div className="text-sm text-gray-500">{crop.category} &middot; {crop.duration_days} days</div>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${RISK_COLOR[c.risk_label]||RISK_COLOR.Medium}`}>{c.risk_label}</span>
+              <span className={`badge ${crop.season === 'Rabi' ? 'badge-blue' : crop.season === 'Kharif' ? 'badge-green' : crop.season === 'Zaid' ? 'badge-yellow' : 'badge-gray'}`}>
+                {crop.season}
+              </span>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-center mb-3">
-              <div className="bg-black/20 rounded-xl p-2"><div className="text-[10px] text-slate-500">Yield</div><div className="text-sm font-bold text-white">{c.yield_quintal_per_acre} q/ac</div></div>
-              <div className="bg-black/20 rounded-xl p-2"><div className="text-[10px] text-slate-500">Price</div><div className="text-sm font-bold text-emerald-300">{c.price_per_quintal?`₹${c.price_per_quintal}/q`:'Market'}</div></div>
-              <div className="bg-black/20 rounded-xl p-2"><div className="text-[10px] text-slate-500">Cost</div><div className="text-sm font-bold text-slate-300">₹{c.cost_per_acre.toLocaleString('en-IN')}</div></div>
+
+            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+              <div>
+                <span className="text-gray-500">MSP:</span>
+                <span className="ml-1 font-medium">₹{crop.msp?.toLocaleString()}/qt</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Yield:</span>
+                <span className="ml-1 font-medium">{crop.yield_quintal_per_acre} qt/ac</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Cost:</span>
+                <span className="ml-1 font-medium">₹{crop.cost_per_acre?.toLocaleString()}/ac</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Profit:</span>
+                <span className="ml-1 font-medium text-green-700">₹{crop.profit_per_acre?.toLocaleString()}/ac</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Water:</span>
+                <span className="ml-1 font-medium">{crop.water_requirement_mm}mm</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Risk:</span>
+                <span className={`ml-1 font-medium ${crop.risk_score <= 3 ? 'text-green-700' : crop.risk_score <= 6 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {crop.risk_label}
+                </span>
+              </div>
             </div>
-            <div className="bg-emerald-500/10 border border-emerald-500/15 rounded-xl p-2.5 flex justify-between text-xs mb-3">
-              <span className="text-slate-400">Profit / acre</span><span className="font-bold text-emerald-300">₹{c.profit_per_acre.toLocaleString('en-IN')}</span>
-              <span className="text-slate-500">Revenue ₹{c.revenue_per_acre.toLocaleString('en-IN')}</span>
+
+            <div className="flex flex-wrap gap-1">
+              <span className="badge badge-green">Sustainability: {crop.sustainability_score}/10</span>
+              {crop.glut_risk === 'High' || crop.glut_risk === 'Very High' ? (
+                <span className="badge badge-red">Glut: {crop.glut_risk}</span>
+              ) : null}
+              <span className="badge badge-gray">Demand: {crop.demand_trend}</span>
             </div>
-            <div className="flex flex-wrap gap-1.5 text-[10px]">
-              <span className="bg-white/5 border border-white/10 rounded-full px-2 py-1 text-slate-300">Water {c.water_requirement_mm} mm</span>
-              <span className="bg-white/5 border border-white/10 rounded-full px-2 py-1 text-slate-300">Sustain {c.sustainability_score}/100</span>
-              <span className={`border rounded-full px-2 py-1 ${c.glut_risk==='Low'?'bg-green-500/10 border-green-500/20 text-green-300':'bg-red-500/10 border-red-500/20 text-red-300'}`}>Glut {c.glut_risk}</span>
-              <span className="bg-cyan-500/10 border border-cyan-500/20 rounded-full px-2 py-1 text-cyan-300">{c.demand_trend} demand</span>
-            </div>
-            <div className="mt-3 text-[11px] text-slate-500">Soil fit — Loamy {c.soil_suitability.loamy}% • Clay {c.soil_suitability.clay}% • Sandy {c.soil_suitability.sandy}% • Black {c.soil_suitability.black}%</div>
           </div>
         ))}
       </div>

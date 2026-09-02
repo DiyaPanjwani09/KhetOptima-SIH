@@ -1,18 +1,19 @@
 import axios from 'axios';
-import API_URL from './config';
+import { API_URL } from './config';
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 120000,
+  timeout: 30000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === 'ECONNABORTED') {
-      error.message = 'Request timed out. Please try again.';
+      console.error('Request timed out');
     } else if (!error.response) {
-      error.message = 'Network error. Please check your connection.';
+      console.error('Network error');
     }
     return Promise.reject(error);
   }

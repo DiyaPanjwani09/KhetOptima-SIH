@@ -1,5 +1,5 @@
 #!/bin/bash
-# KhetOptima - Farm Decision & Crop Portfolio Optimization Engine
+# KhetOptima Setup
 
 set -e
 
@@ -7,50 +7,44 @@ echo "=========================================="
 echo "KhetOptima Setup"
 echo "=========================================="
 
-# Check if Python is installed
 if ! command -v python3 &> /dev/null; then
     echo "Python 3 is required but not installed."
     exit 1
 fi
 
-# Check if Node.js is installed
 if ! command -v node &> /dev/null; then
     echo "Node.js is required but not installed."
     exit 1
 fi
 
-echo "Step 1: Setting up backend..."
-cd backend
+echo "Step 1: Setting up Python ML Service..."
+cd ml-service
 
-# Create virtual environment
 if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 
-# Activate virtual environment
 source venv/bin/activate || . venv/Scripts/activate
-
-# Install dependencies
 pip install --upgrade pip
-pip install -r ../requirements.txt
+pip install -r requirements.txt
 
-# Create necessary directories
-mkdir -p uploads
-
-echo "Step 2: Setting up frontend..."
-cd ../frontend
-
-# Install dependencies
+echo "Step 2: Setting up Node.js Backend..."
+cd ../backend
 npm install
 
-echo "Step 3: Setup complete!"
+echo "Step 3: Setting up Frontend..."
+cd ../frontend
+npm install
+
+echo "Step 4: Setup complete!"
 echo "=========================================="
 echo ""
-echo "To start the backend:"
-echo "  cd backend && uvicorn main:app --reload --port 8000"
-echo "  API docs: http://localhost:8000/docs"
-echo "  KhetOptima: http://localhost:8000/api/v1/khet-optima/optimize"
+echo "To start the ML Service (Terminal 1):"
+echo "  cd ml-service && source venv/bin/activate && uvicorn main:app --reload --port 8000"
 echo ""
-echo "To start the frontend:"
-echo "  cd frontend && npm start  # http://localhost:3000"
+echo "To start the Backend (Terminal 2):"
+echo "  cd backend && npm run dev"
+echo ""
+echo "To start the Frontend (Terminal 3):"
+echo "  cd frontend && npm start"
 echo ""
