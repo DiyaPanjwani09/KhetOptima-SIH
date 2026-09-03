@@ -26,7 +26,7 @@ export default function Market() {
             {data.glut_alerts.map((alert, i) => (
               <div key={i} className="card border-red-200 bg-red-50">
                 <div className="font-medium text-red-800">{alert.crop}</div>
-                <div className="text-sm text-red-600">Glut risk: {alert.glut_risk}</div>
+                <div className="text-sm text-red-600">Glut risk: {alert.risk}</div>
                 {alert.message && <div className="text-xs text-red-500 mt-1">{alert.message}</div>}
               </div>
             ))}
@@ -41,7 +41,7 @@ export default function Market() {
             {data.high_demand.map((item, i) => (
               <div key={i} className="card border-green-200 bg-green-50">
                 <div className="font-medium text-green-800">{item.crop}</div>
-                <div className="text-sm text-green-600">Demand: {item.demand_trend}</div>
+                <div className="text-sm text-green-600">Demand: {item.trend}</div>
                 {item.msp && <div className="text-xs text-green-500 mt-1">MSP: ₹{item.msp}/quintal</div>}
               </div>
             ))}

@@ -7,7 +7,7 @@ export default function KhetHome() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    khetApi.stats().then((r) => setStats(r.data)).catch(() => {});
+    khetApi.stats().then((data) => setStats(data)).catch(() => {});
   }, []);
 
   return (

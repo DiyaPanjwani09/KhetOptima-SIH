@@ -4,8 +4,8 @@ const mlService = require('../services/ml.service');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 router.get('/', asyncHandler(async (req, res) => {
-  const crops = await mlService.getCrops();
-  res.json(crops);
+  const data = await mlService.getCrops();
+  res.json(data.crops || data);
 }));
 
 router.get('/:id', asyncHandler(async (req, res) => {

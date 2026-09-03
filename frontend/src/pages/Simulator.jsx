@@ -52,7 +52,8 @@ export default function Simulator() {
     setLoading(true);
     try {
       const res = await khetApi.simulateAll(farm);
-      setAllResults(res.data);
+      const data = res.data;
+      setAllResults(data.scenarios || (Array.isArray(data) ? data : []));
       setResult(null);
       toast.success('All scenarios simulated!');
     } catch (err) {
@@ -189,7 +190,7 @@ export default function Simulator() {
                 <div key={i} className="card">
                   <div className="flex justify-between">
                     <span className="font-medium">{a.crop_name || a.crop_id}</span>
-                    <span className="text-green-700 font-medium">₹{a.profit?.toLocaleString()}</span>
+                    <span className="text-green-700 font-medium">₹{a.expected_profit?.toLocaleString()}</span>
                   </div>
                   <div className="text-sm text-gray-500">{a.acres?.toFixed(1)} acres</div>
                 </div>

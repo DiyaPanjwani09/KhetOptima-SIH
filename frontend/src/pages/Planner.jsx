@@ -56,9 +56,9 @@ export default function Planner() {
 
   const barData = result?.allocations?.map((a) => ({
     name: a.crop_name || a.crop_id,
-    revenue: a.revenue,
-    cost: a.cost,
-    profit: a.profit,
+    revenue: a.expected_revenue,
+    cost: a.expected_cost,
+    profit: a.expected_profit,
   })) || [];
 
   return (
@@ -184,14 +184,14 @@ export default function Planner() {
                         <div className="text-sm text-gray-500 mt-0.5">{a.acres?.toFixed(1)} acres ({a.land_percentage?.toFixed(0)}%)</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-green-700">₹{a.profit?.toLocaleString()}</div>
+                        <div className="font-semibold text-green-700">₹{a.expected_profit?.toLocaleString()}</div>
                         <div className="text-xs text-gray-400">profit</div>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      <span className="badge badge-blue">Yield: {a.yield_quintal?.toFixed(1)} qt</span>
-                      <span className="badge badge-green">Revenue: ₹{a.revenue?.toLocaleString()}</span>
-                      <span className="badge badge-gray">Soil: {a.soil_suitability_pct?.toFixed(0)}%</span>
+                      <span className="badge badge-blue">Yield: {a.expected_yield_quintal?.toFixed(1)} qt</span>
+                      <span className="badge badge-green">Revenue: ₹{a.expected_revenue?.toLocaleString()}</span>
+                      <span className="badge badge-gray">Soil: {a.soil_suitability?.toFixed(0)}%</span>
                     </div>
                     {a.explanation && <p className="text-xs text-gray-500 mt-2">{a.explanation}</p>}
                   </div>

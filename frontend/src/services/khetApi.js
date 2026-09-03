@@ -7,7 +7,14 @@ export const khetApi = {
   simulate: (payload) => api.post('/api/simulation', payload),
   simulateAll: (payload) => api.post('/api/simulation/all', payload),
   market: () => api.get('/api/market/intelligence'),
-  stats: () => api.get('/api/crops').then((r) => ({ totalCrops: r.data.length })),
+  stats: () => api.get('/api/crops').then((r) => {
+    const crops = Array.isArray(r.data) ? r.data : [];
+    const totalCrops = crops.length;
+    const avgProfit = crops.length > 0
+      ? Math.round(crops.reduce((sum, c) => sum + (c.profit_per_acre || 0), 0) / crops.length)
+      : 0;
+    return { totalCrops, avgProfit };
+  }),
   getWeather: (state) => api.get(`/api/weather?state=${state || 'Delhi'}`),
   getProducts: (params) => api.get('/api/marketplace/products', { params }),
   getServices: (params) => api.get('/api/marketplace/services', { params }),
