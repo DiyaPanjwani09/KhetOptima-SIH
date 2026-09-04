@@ -13,30 +13,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="KhetOptima - Simulate. Optimize. Grow for Profit.",
-    description="AI-powered farm decision and crop portfolio optimization platform for Indian farmers",
+    title="KhetOptima ML Service",
+    description="Internal ML optimization service for KhetOptima",
     version="2.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origin_list,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
 app.include_router(khet_optima.router, prefix="/api/v1", tags=["khet-optima"])
-
-
-@app.get("/")
-async def root():
-    return {
-        "message": "KhetOptima API - Simulate. Optimize. Grow for Profit.",
-        "version": "2.0.0",
-        "docs": "/docs",
-        "khet_optima": "/api/v1/khet-optima/optimize",
-    }
 
 
 @app.get("/health")
@@ -51,7 +41,7 @@ async def health_check():
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=settings.host,
+        host="0.0.0.0",
         port=settings.port,
         reload=settings.environment == "development",
     )

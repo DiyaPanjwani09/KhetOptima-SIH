@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: khetoptima-backend
+    name: khetoptima-ml
     runtime: python
     plan: free
-    rootDir: backend
-    buildCommand: "pip install -r ../requirements.txt"
+    rootDir: ml-service
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /health
     envVars:
@@ -12,8 +12,33 @@ services:
         value: "3.11.11"
       - key: ENVIRONMENT
         value: production
-      - key: ALLOWED_ORIGINS
-        value: https://khetoptima-frontend.onrender.com
+
+  - type: web
+    name: khetoptima-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: "npm install"
+    startCommand: "node src/server.js"
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: 3001
+      - key: ML_SERVICE_URL
+        fromService:
+          name: khetoptima-ml
+          type: web
+          property: url
+      - key: CORS_ORIGIN
+        fromService:
+          name: khetoptima-frontend
+          type: web
+          property: url
+      - key: NODE_ENV
+        value: production
+
   - type: web
     name: khetoptima-frontend
     runtime: static
@@ -24,4 +49,7 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: REACT_APP_API_URL
-        value: https://khetoptima-backend.onrender.com
+        fromService:
+          name: khetoptima-backend
+          type: web
+          property: url

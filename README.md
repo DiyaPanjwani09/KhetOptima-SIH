@@ -1,93 +1,121 @@
-# 🌾 KhetOptima — Simulate. Optimize. Grow for Profit.
+# KhetOptima
 
-AI-powered farm decision & crop portfolio optimization platform for Indian farmers.
+AI-powered farm decision and crop portfolio optimization platform for Indian farmers.
 
-> **Core question:** Given land, soil, water, budget, market & risk tolerance, what combination of crops, how much land each, and what profit can you realistically expect?
-
-## ✨ Features Implemented
-
-- **Farm Digital Twin** — land, soil, water, budget, season, state modeled
-- **Crop Portfolio Optimization** — LP (HiGHS via scipy) + greedy fallback; maximizes `Expected Profit − Risk Penalty` under land/water/budget/labour constraints
-- **Explainable Plan** — soil %, water, profit/acre, risk, rotation benefit per crop
-- **What-If Simulator** — rainfall, water, price, fertilizer, budget, yield sliders; single & batch (6 predefined) scenarios
-- **Market & Glut Intelligence** — high-demand crops & oversupply warnings (tomato/potato/onion etc.)
-- **16 Crops** — wheat, rice, mustard, chickpea, cotton, soybean, maize, tomato, potato, onion, sugarcane, groundnut, moong, barley, sunflower, chilli with MSP, yield, cost, water, risk, sustainability
-- **Analytics** — pie (land %), bar (profit/revenue/cost), water %, confidence, sustainability
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-Farmer → Farm Profile → Digital Twin → ML Predictions → Optimization Engine → What-If Simulator → KhetOptima Plan
-                              crops DB (yield/price/cost/water/risk) + soil suitability + MSP
+React Frontend
+       |
+Node.js / Express API
+       |
+ +-------+-------+
+ |       |       |
+Python  Weather  Marketplace
+ML      Service  Service/Data
+Service
 ```
 
-## 🚀 Quick Start
+## Features
 
-### Backend (FastAPI)
+- **Farm Planner** - AI-optimized crop portfolio based on land, soil, water, budget, and risk
+- **What-If Simulator** - Test drought, price crash, budget cut, and other scenarios
+- **Crop Encyclopedia** - 16 Indian crops with MSP, yield, cost, risk, sustainability
+- **Market Intelligence** - Glut alerts, demand trends, mandi prices
+- **Marketplace** - Buy seeds, equipment, fertilizers, and farming services
+- **Weather** - Current conditions, 5-day forecast, farm advisory
+- **Advisory** - Irrigation, crop management, soil, and market tips
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Tailwind CSS, Recharts |
+| Backend | Node.js, Express |
+| ML Service | Python, FastAPI, SciPy |
+
+## Quick Start
+
+### 1. Python ML Service
+
+```bash
+cd ml-service
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+### 2. Node.js Backend
+
 ```bash
 cd backend
-pip install -r ../requirements.txt
-uvicorn main:app --reload --port 8000
-# docs: http://localhost:8000/docs
-# KhetOptima: http://localhost:8000/api/v1/khet-optima/optimize
+npm install
+npm run dev
 ```
 
-### Frontend (React)
+### 3. React Frontend
+
 ```bash
 cd frontend
 npm install
-echo "REACT_APP_API_URL=http://localhost:8000" > .env
-npm start  # http://localhost:3000
-npm run build  # production
+npm start
 ```
 
-## 🔌 API
+The app will be available at `http://localhost:3000`.
+
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | /api/v1/khet-optima/crops | List 16 crops with economics |
-| GET | /api/v1/khet-optima/crops/{id} | Crop detail |
-| POST | /api/v1/khet-optima/optimize | Optimize portfolio |
-| POST | /api/v1/khet-optima/simulate | Single what-if |
-| POST | /api/v1/khet-optima/simulate/all | All 6 scenarios |
-| GET | /api/v1/khet-optima/market/intelligence | Glut & demand |
-| GET | /api/v1/khet-optima/stats | Platform stats |
-| GET | /health | Health |
+| GET | /api/health | Backend health check |
+| GET | /api/crops | List all crops |
+| GET | /api/crops/:id | Crop detail |
+| POST | /api/optimization/optimize | Optimize farm plan |
+| POST | /api/simulation | Run what-if scenario |
+| POST | /api/simulation/all | Run all 6 scenarios |
+| GET | /api/market/intelligence | Market data |
+| GET | /api/weather | Weather forecast |
+| GET | /api/marketplace/products | Browse products |
+| GET | /api/marketplace/services | Browse services |
+| POST | /api/marketplace/listings | Create listing |
+| GET | /api/advisory | Farming tips |
 
-### Example Optimize Request
-```json
-{
-  "total_land_acres": 10,
-  "soil_type": "loamy",
-  "water_availability_mm": 500,
-  "budget_inr": 145000,
-  "state": "Punjab",
-  "season": "Rabi",
-  "risk_tolerance": "medium",
-  "max_crops": 4
-}
+## Environment Variables
+
+### Backend (.env)
+
 ```
-Response includes `allocations[]` (acres, %, yield, revenue, cost, profit, soil %, risk, explanation), `total_profit`, `water_usage_pct`, `risk_level`, `confidence_pct`.
+PORT=3001
+ML_SERVICE_URL=http://localhost:8000
+WEATHER_API_KEY=
+CORS_ORIGIN=http://localhost:3000
+NODE_ENV=development
+```
 
-## 🧠 Optimization Details
+### ML Service (.env)
 
-- **Objective:** maximize risk-adjusted profit per acre = `(yield*price - cost) − riskPenalty*risk_score − glutPenalty` × soilFactor
-- **Constraints:** land ≤ available, water ≤ available, cost ≤ budget, labour ≤ available, per-crop cap 45-55% for diversification
-- **Solver:** `scipy.optimize.linprog` (HiGHS) if available, else greedy by RAP sorted order
+```
+PORT=8000
+ENVIRONMENT=development
+```
 
-## 📊 Frontend Pages
+### Frontend (.env)
 
-- `/` — landing (hero, stats, features)
-- `/planner` — farm form + pie/bar + explainable cards
-- `/simulator` — dials + single/batch impact
-- `/crops` — encyclopedia with filters
-- `/market` — glut & demand intelligence
+```
+REACT_APP_API_URL=http://localhost:3001
+```
 
-## 🛠️ Tech Stack
-React 18, Tailwind, Recharts, Framer Motion, FastAPI, Pydantic, scipy/pulp, PostgreSQL (optional — optimizer is stateless)
+## Deployment
 
-## ⚠️ Disclaimer
-Decision-support only; estimates based on models & available data, not guaranteed outcomes.
+The project deploys as three services:
 
-## 📜 License
+1. **Python ML Service** - FastAPI optimizer
+2. **Node.js Backend** - Express API layer
+3. **React Frontend** - Static site
+
+Use the provided `render.yaml` for Render Blueprint deployment.
+
+## License
+
 MIT
